@@ -1,6 +1,8 @@
 let gulp = require('gulp'),
   sass = require('gulp-sass'),
-  browserSync = require('browser-sync');
+  browserSync = require('browser-sync'),
+  uglify = require('gulp-uglify'),
+  concat = require('gulp-concat');
 
 let project_folder = 'dist';
 let source_folder = '#src';
@@ -46,6 +48,17 @@ gulp.task('scss', function () {
     .pipe(browserSync.stream());
 });
 
+gulp.task('js', function () {
+  return gulp.src([
+    'node_modules/slick-carousel/slick/slick.js',
+    'node_modules/magnific-popup/dist/jquery.magnific-popup.js'
+  ])
+    .pipe(concat('libs.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest(path.build.js))
+    .pipe(browserSync.stream());
+});
+
 gulp.task('browser-sync', function () {
   browserSync.init({
     server: {
@@ -59,9 +72,10 @@ gulp.task('browser-sync', function () {
 gulp.task('watch', function () {
   gulp.watch(path.src.css, gulp.parallel('scss'));
   gulp.watch(path.src.html, gulp.parallel('html'));
+  gulp.watch(path.src.js, gulp.parallel('js'));
 });
 
-gulp.task('default', gulp.parallel('browser-sync', 'watch', 'html'));
+gulp.task('default', gulp.parallel('browser-sync', 'watch', 'html', 'scss', 'js'));
 
 
 

@@ -1,15 +1,19 @@
-let gulp = require('gulp'),
-  sass = require('gulp-sass'),
-  browserSync = require('browser-sync'),
-  uglify = require('gulp-uglify'),
-  concat = require('gulp-concat'),
-  imagemin = require('gulp-imagemin'),
-  rename = require('gulp-rename');
+const { src, dest, parallel, series, watch } = require('gulp');
+const browserSync = require('browser-sync').create();
+const uglify = require('gulp-uglify-es').default;
+const concat = require('gulp-concat');
+const imagemin = require('gulp-imagemin');
+const rename = require('gulp-rename');
 
-let project_folder = 'dist';
-let source_folder = '#src';
+const sourcemap = require('gulp-sourcemaps');
+const sass = require('gulp-sass');
+const less = require('gulp-less');
+const stylus = require('gulp-stylus');
 
-let fs = require('fs');
+const project_folder = 'build';
+const source_folder = '#src';
+
+const fs = require('fs');
 
 let path = {
   build: {
@@ -22,7 +26,7 @@ let path = {
   src: {
     html: [source_folder + '/*.html', source_folder + '/templates/*.html', '!' + source_folder + '/templates/_*.html'],
     css: source_folder + '/scss/**/*.scss',
-    js: source_folder + '/js/app.js',
+    js: source_folder + '/js/main.js',
     img: source_folder + '/img/**/*.{jpg,png,svg,gif,ico,webp}',
     fonts: source_folder + '/fonts/*.ttf',
   },
@@ -35,72 +39,84 @@ let path = {
   clean: './' + project_folder + '/'
 }
 
-gulp.task('html', function () {
-  return gulp.src(path.src.html)
-    .pipe(gulp.dest(path.build.html))
+/* gulp.task('html', function () {
+  return src(path.src.html)
+    .pipe(dest(path.build.html))
     .pipe(browserSync.stream());
 });
 
 gulp.task('scss', function () {
-  return gulp.src(path.src.css)
+  return src(path.src.css)
+    .pipe(sourcemap.init())
     .pipe(sass({
       outputStyle: "compressed"
     }))
     .pipe(rename({
       suffix: '.min'
     }))
-    .pipe(gulp.dest(path.build.css))
+    .pipe(sourcemap.write('./'))
+    .pipe(dest(path.build.css))
     .pipe(browserSync.stream());
 });
 
-gulp.task('script', function () {
-  return gulp.src(path.src.js)
-    .pipe(gulp.dest(path.build.js))
+gulp.task('css_concat', function () {
+  return src([
+    'node_modules/normalize.css/normalize.css',
+    'node_modules/slick-carousel/slick/slick.css',
+    'node_modules/magnific-popup/dist/magnific-popup.css'
+  ])
+    .pipe(concat('libs.min.css'))
+    .pipe(dest(path.build.css))
     .pipe(browserSync.stream());
 });
 
-gulp.task('js', function () {
-  return gulp.src([
+gulp.task('js_concat', function () {
+  return src([
     'node_modules/slick-carousel/slick/slick.js',
     'node_modules/magnific-popup/dist/jquery.magnific-popup.js'
   ])
     .pipe(concat('libs.min.js'))
     .pipe(uglify())
-    .pipe(gulp.dest(path.build.js))
+    .pipe(dest(path.build.js))
     .pipe(browserSync.stream());
 });
 
 gulp.task('img', function () {
-  return gulp.src(path.src.img)
+  return src(path.src.img)
     .pipe(imagemin({
       progressive: true,
       svgoPlugins: [{ removeViewBox: false }],
       interlaced: true,
       optimizationLevel: 3
     }))
-    .pipe(gulp.dest(path.build.img))
+    .pipe(dest(path.build.img))
     .pipe(browserSync.stream());
-})
+}) */
 
-gulp.task('browser-sync', function () {
+function browsersync() {
   browserSync.init({
     server: {
       baseDir: './' + project_folder + '/',
     },
     port: 4000,
-    notify: false
+    notify: false,
+    online: true
   });
-});
+};
 
-gulp.task('watch', function () {
-  gulp.watch(path.src.css, gulp.parallel('scss'));
-  gulp.watch(path.src.html, gulp.parallel('html'));
-  gulp.watch(path.src.js, gulp.parallel('script'));
-  gulp.watch(path.src.img, gulp.parallel('img'));
-});
+function scripts() {
+  return src(path.src.js)
+    .pipe(concat('main.min.js'))
+    .pipe(uglify())
+    .pipe(dest(path.build.js))
+    .pipe(browserSync.stream());
+}
 
-gulp.task('default', gulp.parallel('browser-sync', 'watch', 'html', 'scss', 'js', 'img', 'script'));
+function startwatch() {
+  watch([path.src.js, '!#src/js/**/*.min.js'], scripts);
+}
 
+exports.browsersync = browsersync;
+exports.scripts = scripts;
 
-
-
+exports.default = parallel(scripts, browsersync, startwatch);

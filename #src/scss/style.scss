@@ -1,8 +1,12 @@
 //<БИБЛИОТЕКИ>======================================================================
-@import '../../node_modules/normalize.css/normalize';
+// @import '../../node_modules/normalize.css/normalize';
 // @import '../../node_modules/slick-carousel/slick/slick.scss';
 // @import '../../node_modules/magnific-popup/dist/magnific-popup';
 //</БИБЛИОТЕКИ>=====================================================================
+@import 'vars';
+@import 'libs';
+
+@import 'media';
 //<МИКСИНЫ>=========================================================================
 // @import 'mixins.scss';
 //<МИКСИНЫ>================================================================
@@ -33,3 +37,6 @@ $md2: 991.98;
 $md3: 767.98;
 $md4: 479.98;
 //</ПЕРЕМЕННЫЕ>======================================================
+body{
+  background-color: aquamarine;
+}

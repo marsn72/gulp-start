@@ -8,7 +8,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const cleancss = require('gulp-clean-css');
 
 const sourcemap = require('gulp-sourcemaps');
-const sass = require('gulp-sass');
+const scss = require('gulp-sass');
 const less = require('gulp-less');
 const stylus = require('gulp-stylus');
 
@@ -69,16 +69,14 @@ function scripts() {
 function styles () {
   return src(path.src.css)
     .pipe(sourcemap.init())
-    .pipe(sass({
+    .pipe(scss({
       outputStyle: 'compressed'
     }))
     .pipe(autoprefixer({
       overrideBrowserslist: ['last 10 versions'],
       grid: true
     }))
-    .pipe(rename({
-      suffix: '.min'
-    }))
+    .pipe(concat('style.min.css'))
     .pipe(sourcemap.write('./'))
     .pipe(dest(path.build.css))
     .pipe(browserSync.stream());

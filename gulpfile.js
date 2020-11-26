@@ -1,9 +1,11 @@
 const { src, dest, parallel, series, watch } = require('gulp');
+
 const browserSync = require('browser-sync').create();
 const uglify = require('gulp-uglify-es').default;
 const concat = require('gulp-concat');
 const imagemin = require('gulp-imagemin');
 const autoprefixer = require('gulp-autoprefixer');
+const del = require('del');
 
 const sourcemap = require('gulp-sourcemaps');
 const scss = require('gulp-sass');
@@ -50,21 +52,28 @@ function browsersync() {
   });
 };
 
-function html () {
+function clean(){
+  return del('dist');
+}
+
+function html() {
   return src(path.src.html)
     .pipe(dest(path.build.html))
     .pipe(browserSync.stream());
 }
 
 function scripts() {
-  return src(path.src.js)
+  return src([
+    'node_modules/jquery/dist/jquery.js',
+    path.src.js,
+  ])
     .pipe(concat('main.min.js'))
     .pipe(uglify())
     .pipe(dest(path.build.js))
     .pipe(browserSync.stream());
 }
 
-function styles () {
+function styles() {
   return src(path.src.css)
     .pipe(sourcemap.init())
     .pipe(scss({
@@ -80,7 +89,7 @@ function styles () {
     .pipe(browserSync.stream());
 }
 
-function images () {
+function images() {
   return src(path.src.img)
     .pipe(imagemin({
       progressive: true,
@@ -92,10 +101,15 @@ function images () {
     .pipe(browserSync.stream());
 }
 
-function startwatch() {
+function fonts(){
+  return src(path.src.fonts)
+    .pipe(dest(path.build.fonts));
+}
+
+function watching() {
   watch(path.src.html, html);
-  watch([path.src.js, '!#src/js/**/*.min.js'], scripts);
-  watch([path.src.css, '!#src/css/**/*.min.css'], styles);
+  watch(path.src.js, scripts);
+  watch(path.src.css, styles);
   watch(path.src.img, images);
   watch(path.src.html).on('change', browserSync.reload);
 }
@@ -105,5 +119,6 @@ exports.html = html;
 exports.scripts = scripts;
 exports.styles = styles;
 exports.images = images;
+exports.fonts = fonts;
 
-exports.default = parallel(html, scripts, styles, browsersync, startwatch);
+exports.default = series(clean, parallel(html, scripts, styles, fonts, browsersync, watching));

@@ -12,7 +12,7 @@ const sass = require('gulp-sass');
 const less = require('gulp-less');
 const stylus = require('gulp-stylus');
 
-const project_folder = 'build';
+const project_folder = 'dist';
 const source_folder = '#src';
 
 const fs = require('fs');
@@ -40,32 +40,6 @@ let path = {
   },
   clean: './' + project_folder + '/'
 }
-
-/* gulp.task('html', );
-
-gulp.task('css_concat', function () {
-  return src([
-    'node_modules/normalize.css/normalize.css',
-    'node_modules/slick-carousel/slick/slick.css',
-    'node_modules/magnific-popup/dist/magnific-popup.css'
-  ])
-    .pipe(concat('libs.min.css'))
-    .pipe(dest(path.build.css))
-    .pipe(browserSync.stream());
-});
-
-gulp.task('js_concat', function () {
-  return src([
-    'node_modules/slick-carousel/slick/slick.js',
-    'node_modules/magnific-popup/dist/jquery.magnific-popup.js'
-  ])
-    .pipe(concat('libs.min.js'))
-    .pipe(uglify())
-    .pipe(dest(path.build.js))
-    .pipe(browserSync.stream());
-});
-
-*/
 
 function browsersync() {
   browserSync.init({

@@ -9,6 +9,10 @@
   "author": "Мараев Сергей",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-module-resolver": "^4.0.0",
     "browser-sync": "^2.26.13",
     "del": "^6.0.0",
     "gulp": "^4.0.2",
@@ -16,10 +20,13 @@
     "gulp-concat": "^2.6.1",
     "gulp-imagemin": "^7.1.0",
     "gulp-less": "^4.0.1",
+    "gulp-rename": "^2.0.0",
     "gulp-sass": "^4.1.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-stylus": "^2.7.0",
-    "gulp-uglify-es": "^2.0.0"
+    "gulp-uglify-es": "^2.0.0",
+    "rename": "^1.0.4",
+    "webpack-stream": "^6.1.1"
   },
   "dependencies": {
     "jquery": "^3.5.1",

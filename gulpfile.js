@@ -1,11 +1,13 @@
 const { src, dest, parallel, series, watch } = require('gulp');
 
 const browserSync = require('browser-sync').create();
+const webpack = require('webpack-stream');
 const uglify = require('gulp-uglify-es').default;
 const concat = require('gulp-concat');
 const imagemin = require('gulp-imagemin');
 const autoprefixer = require('gulp-autoprefixer');
 const del = require('del');
+const rename = require('gulp-rename');
 
 const sourcemap = require('gulp-sourcemaps');
 const scss = require('gulp-sass');
@@ -52,7 +54,7 @@ function browsersync() {
   });
 };
 
-function clean(){
+function clean() {
   return del('dist');
 }
 
@@ -63,12 +65,26 @@ function html() {
 }
 
 function scripts() {
-  return src([
-    'node_modules/jquery/dist/jquery.js',
-    path.src.js,
-  ])
-    .pipe(concat('main.min.js'))
-    .pipe(uglify())
+  return src(path.src.js)
+    .pipe(webpack({
+      mode: 'production',
+      module: {
+        rules: [
+          {
+            test: /\.(js)$/,
+            exclude: /(node_modules)/,
+            loader: 'babel-loader',
+            query: {
+              presets: ['@babel/env']
+            }
+          }
+        ]
+      }
+    })).on('error', function handleError() {
+      this.emit('end');
+    })
+    .pipe(rename('main.min.js'))
+    //.pipe(uglify())
     .pipe(dest(path.build.js))
     .pipe(browserSync.stream());
 }
@@ -101,7 +117,7 @@ function images() {
     .pipe(browserSync.stream());
 }
 
-function fonts(){
+function fonts() {
   return src(path.src.fonts)
     .pipe(dest(path.build.fonts));
 }
@@ -121,4 +137,4 @@ exports.styles = styles;
 exports.images = images;
 exports.fonts = fonts;
 
-exports.default = series(clean, parallel(html, scripts, styles, fonts, browsersync, watching));
+exports.default = series(clean, parallel(html, scripts, styles, images, fonts, browsersync, watching));
